@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { Phone, ArrowLeft, Smartphone, X } from "lucide-react"
+import { Phone, ArrowLeft, Smartphone, X, MessageCircle, PhoneCall } from "lucide-react"
 import { useRouter, usePathname } from "next/navigation"
 import { trackWhatsAppClick, trackPhoneClick, gtagEvent } from "@/lib/leadTracking"
 
@@ -16,6 +16,10 @@ const WHATSAPP_MESSAGE = encodeURIComponent(
 )
 const WHATSAPP_NUMBER = "4917632333561"
 const PHONE_NUMBER = "+4917632333561"
+const PHONE_DISPLAY = "0176 32333561"
+
+// Confirmation Modal Types
+type ConfirmationType = 'phone' | 'whatsapp' | null
 
 export default function FloatingButtons() {
   const router = useRouter()
@@ -25,6 +29,10 @@ export default function FloatingButtons() {
   const [isInstalling, setIsInstalling] = useState(false)
   const [isInstalled, setIsInstalled] = useState(false)
   const [showIOSTooltip, setShowIOSTooltip] = useState(false)
+
+  // Confirmation states
+  const [confirmationType, setConfirmationType] = useState<ConfirmationType>(null)
+  const [confirmationStep, setConfirmationStep] = useState(0) // 0 = hidden, 1 = first confirm, 2 = final confirm
 
   const isHomePage = pathname === "/"
 
@@ -64,6 +72,57 @@ export default function FloatingButtons() {
       window.removeEventListener("appinstalled", handleAppInstalled)
     }
   }, [])
+
+  // Handle initial button click - show first confirmation
+  const handlePhoneButtonClick = (e: React.MouseEvent) => {
+    e.preventDefault()
+    setConfirmationType('phone')
+    setConfirmationStep(1)
+    gtagEvent("phone_button_click", { step: "initial" })
+  }
+
+  const handleWhatsAppButtonClick = (e: React.MouseEvent) => {
+    e.preventDefault()
+    setConfirmationType('whatsapp')
+    setConfirmationStep(1)
+    gtagEvent("whatsapp_button_click", { step: "initial" })
+  }
+
+  // Handle first confirmation - show final confirmation
+  const handleFirstConfirm = () => {
+    setConfirmationStep(2)
+    gtagEvent(`${confirmationType}_button_click`, { step: "first_confirm" })
+  }
+
+  // Handle final confirmation - track event and execute action
+  const handleFinalConfirm = () => {
+    if (confirmationType === 'phone') {
+      // Track the confirmed phone call
+      trackPhoneClick()
+      gtagEvent("phone_call_confirmed", { step: "final_confirm" })
+
+      // Close modal and initiate call
+      setConfirmationStep(0)
+      setConfirmationType(null)
+      window.location.href = `tel:${PHONE_NUMBER}`
+    } else if (confirmationType === 'whatsapp') {
+      // Track the confirmed WhatsApp message
+      trackWhatsAppClick()
+      gtagEvent("whatsapp_message_confirmed", { step: "final_confirm" })
+
+      // Close modal and open WhatsApp
+      setConfirmationStep(0)
+      setConfirmationType(null)
+      window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${WHATSAPP_MESSAGE}`, '_blank')
+    }
+  }
+
+  // Handle cancel/close
+  const handleCancel = () => {
+    gtagEvent(`${confirmationType}_button_click`, { step: "cancelled", at_step: confirmationStep })
+    setConfirmationStep(0)
+    setConfirmationType(null)
+  }
 
   const handleInstallClick = async () => {
     setIsInstalling(true)
@@ -105,6 +164,126 @@ export default function FloatingButtons() {
 
   return (
     <>
+      {/* Confirmation Modal */}
+      {confirmationStep > 0 && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
+          <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-2xl max-w-sm w-full overflow-hidden animate-in zoom-in-95 duration-200">
+            {/* Header */}
+            <div className={`p-4 ${confirmationType === 'phone' ? 'bg-orange-500' : 'bg-green-500'}`}>
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center">
+                    {confirmationType === 'phone' ? (
+                      <PhoneCall className="w-6 h-6 text-white" />
+                    ) : (
+                      <MessageCircle className="w-6 h-6 text-white" />
+                    )}
+                  </div>
+                  <div>
+                    <h3 className="text-white font-bold text-lg">
+                      {confirmationType === 'phone' ? 'Anrufen' : 'WhatsApp'}
+                    </h3>
+                    <p className="text-white/80 text-sm">
+                      {confirmationType === 'phone' ? PHONE_DISPLAY : 'Nachricht senden'}
+                    </p>
+                  </div>
+                </div>
+                <button
+                  onClick={handleCancel}
+                  className="w-8 h-8 bg-white/20 hover:bg-white/30 rounded-full flex items-center justify-center transition-colors"
+                >
+                  <X className="w-5 h-5 text-white" />
+                </button>
+              </div>
+            </div>
+
+            {/* Content */}
+            <div className="p-6">
+              {confirmationStep === 1 ? (
+                <>
+                  <p className="text-gray-700 dark:text-gray-300 text-center mb-6">
+                    {confirmationType === 'phone'
+                      ? 'Möchten Sie uns jetzt anrufen? Wir sind für Sie da!'
+                      : 'Möchten Sie uns über WhatsApp kontaktieren?'}
+                  </p>
+                  <div className="flex gap-3">
+                    <button
+                      onClick={handleCancel}
+                      className="flex-1 py-3 px-4 border border-gray-300 dark:border-gray-600 rounded-xl text-gray-700 dark:text-gray-300 font-medium hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+                    >
+                      Abbrechen
+                    </button>
+                    <button
+                      onClick={handleFirstConfirm}
+                      className={`flex-1 py-3 px-4 rounded-xl text-white font-medium transition-colors ${
+                        confirmationType === 'phone'
+                          ? 'bg-orange-500 hover:bg-orange-600'
+                          : 'bg-green-500 hover:bg-green-600'
+                      }`}
+                    >
+                      Ja, weiter
+                    </button>
+                  </div>
+                </>
+              ) : (
+                <>
+                  <div className="text-center mb-6">
+                    <div className={`w-16 h-16 mx-auto mb-4 rounded-full flex items-center justify-center ${
+                      confirmationType === 'phone' ? 'bg-orange-100 dark:bg-orange-900/30' : 'bg-green-100 dark:bg-green-900/30'
+                    }`}>
+                      {confirmationType === 'phone' ? (
+                        <Phone className={`w-8 h-8 ${confirmationType === 'phone' ? 'text-orange-500' : 'text-green-500'}`} />
+                      ) : (
+                        <svg className="w-8 h-8 text-green-500" fill="currentColor" viewBox="0 0 24 24">
+                          <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
+                        </svg>
+                      )}
+                    </div>
+                    <p className="text-gray-700 dark:text-gray-300 font-medium">
+                      {confirmationType === 'phone'
+                        ? 'Jetzt anrufen und Angebot erhalten!'
+                        : 'WhatsApp öffnen und Nachricht senden!'}
+                    </p>
+                    <p className="text-gray-500 dark:text-gray-400 text-sm mt-2">
+                      {confirmationType === 'phone'
+                        ? `Telefon: ${PHONE_DISPLAY}`
+                        : 'Wir antworten schnell!'}
+                    </p>
+                  </div>
+                  <div className="flex gap-3">
+                    <button
+                      onClick={handleCancel}
+                      className="flex-1 py-3 px-4 border border-gray-300 dark:border-gray-600 rounded-xl text-gray-700 dark:text-gray-300 font-medium hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+                    >
+                      Abbrechen
+                    </button>
+                    <button
+                      onClick={handleFinalConfirm}
+                      className={`flex-1 py-3 px-4 rounded-xl text-white font-bold transition-all transform hover:scale-105 ${
+                        confirmationType === 'phone'
+                          ? 'bg-orange-500 hover:bg-orange-600 shadow-lg shadow-orange-500/30'
+                          : 'bg-green-500 hover:bg-green-600 shadow-lg shadow-green-500/30'
+                      }`}
+                    >
+                      {confirmationType === 'phone' ? '📞 Jetzt anrufen' : '💬 Jetzt schreiben'}
+                    </button>
+                  </div>
+                </>
+              )}
+            </div>
+
+            {/* Footer hint */}
+            <div className="px-6 pb-4">
+              <p className="text-center text-xs text-gray-400">
+                {confirmationStep === 1
+                  ? 'Schritt 1 von 2'
+                  : 'Schritt 2 von 2 - Bestätigen Sie Ihre Aktion'}
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* iOS Install Tooltip - Small & Compact */}
       {showIOSTooltip && (
         <div className="fixed bottom-32 right-4 z-50 animate-in slide-in-from-right-5 fade-in duration-300">
@@ -178,11 +357,8 @@ export default function FloatingButtons() {
         )}
 
         {/* WhatsApp Button with Pulse Animation */}
-        <a
-          href={`https://wa.me/${WHATSAPP_NUMBER}?text=${WHATSAPP_MESSAGE}`}
-          target="_blank"
-          rel="noopener noreferrer"
-          onClick={() => trackWhatsAppClick()}
+        <button
+          onClick={handleWhatsAppButtonClick}
           className="relative group"
           aria-label="WhatsApp kontaktieren"
         >
@@ -201,12 +377,11 @@ export default function FloatingButtons() {
           <span className="absolute right-full mr-3 top-1/2 -translate-y-1/2 px-3 py-2 bg-gray-900 text-white text-sm rounded-lg opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">
             WhatsApp schreiben
           </span>
-        </a>
+        </button>
 
         {/* Phone Button with Pulse Animation */}
-        <a
-          href={`tel:${PHONE_NUMBER}`}
-          onClick={() => trackPhoneClick()}
+        <button
+          onClick={handlePhoneButtonClick}
           className="relative group"
           aria-label="Jetzt anrufen"
         >
@@ -223,7 +398,7 @@ export default function FloatingButtons() {
           <span className="absolute right-full mr-3 top-1/2 -translate-y-1/2 px-3 py-2 bg-gray-900 text-white text-sm rounded-lg opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">
             Jetzt anrufen
           </span>
-        </a>
+        </button>
       </div>
 
       {/* Back Button - Left Side (only on non-home pages) */}

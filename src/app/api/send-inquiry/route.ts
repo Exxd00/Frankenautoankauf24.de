@@ -276,7 +276,19 @@ async function sendEmailViaResend(data: {
   }
 }
 
-// Send to Google Sheets - formatted for the spreadsheet
+// Format date in German
+function formatGermanDateTime(): string {
+  const now = new Date()
+  const day = now.getDate().toString().padStart(2, '0')
+  const month = (now.getMonth() + 1).toString().padStart(2, '0')
+  const year = now.getFullYear()
+  const hours = now.getHours().toString().padStart(2, '0')
+  const minutes = now.getMinutes().toString().padStart(2, '0')
+  const seconds = now.getSeconds().toString().padStart(2, '0')
+  return `${day}.${month}.${year}, ${hours}:${minutes}:${seconds}`
+}
+
+// Send to Google Sheets - formatted for the spreadsheet with GCLID tracking
 async function sendToGoogleSheets(data: {
   brand: string
   model: string
@@ -290,6 +302,13 @@ async function sendToGoogleSheets(data: {
   location: string
   message: string
   image_urls: string[]
+  // GCLID tracking fields
+  source?: string
+  gclid?: string
+  landing_page?: string
+  utm_source?: string
+  utm_medium?: string
+  utm_campaign?: string
 }): Promise<boolean> {
   if (!SHEETS_WEBHOOK_URL) {
     console.log('⚠️ SHEETS_WEBHOOK_URL not configured')
@@ -297,12 +316,23 @@ async function sendToGoogleSheets(data: {
   }
 
   try {
-    // Build payload
+    // Build payload with GCLID tracking
+    // Format: Datum/Uhrzeit | Kontaktart | Name | Telefon | Quelle | GCLID | Bewertung | ...vehicle data
     const payload = {
+      // Primary tracking fields
+      date_time: formatGermanDateTime(),
+      contact_type: '📝 Formular',
       name: data.name || '-',
       phone: data.phone || '-',
+      source: data.source || 'Direct',
+      gclid: data.gclid || '-',
+      rating: '', // Empty for new leads
+
+      // Contact details
       email: data.email || '-',
       location: data.location || '-',
+
+      // Vehicle data
       brand: data.brand || '-',
       model: data.model || '-',
       year: data.year || '-',
@@ -311,9 +341,19 @@ async function sendToGoogleSheets(data: {
       priceExpectation: data.priceExpectation || '-',
       message: data.message || '-',
       image_urls: data.image_urls || [],
+
+      // UTM tracking
+      landing_page: data.landing_page || '',
+      utm_source: data.utm_source || '',
+      utm_medium: data.utm_medium || '',
+      utm_campaign: data.utm_campaign || '',
     }
 
-    console.log('📤 Sending to Google Sheets:', JSON.stringify(payload))
+    console.log('📤 Sending to Google Sheets with GCLID tracking:')
+    console.log('   Name:', payload.name)
+    console.log('   Phone:', payload.phone)
+    console.log('   Source:', payload.source)
+    console.log('   GCLID:', payload.gclid)
 
     // IMPORTANT: Use text/plain for Google Apps Script compatibility
     // Google Apps Script has issues with application/json content-type
@@ -362,12 +402,25 @@ export async function POST(request: NextRequest) {
     const location = formData.get('location') as string || ''
     const message = formData.get('message') as string || ''
 
-    // Log the inquiry
+    // Extract GCLID tracking fields
+    const source = formData.get('source') as string || 'Direct'
+    const gclid = formData.get('gclid') as string || ''
+    const landingPage = formData.get('landing_page') as string || ''
+    const utmSource = formData.get('utm_source') as string || ''
+    const utmMedium = formData.get('utm_medium') as string || ''
+    const utmCampaign = formData.get('utm_campaign') as string || ''
+
+    // Log the inquiry with GCLID tracking
     console.log('=== NEUE AUTO-ANKAUF ANFRAGE ===')
     console.log('Lead ID:', leadId)
     console.log('Von:', name, '-', email, '-', phone)
     console.log('Fahrzeug:', brand, model, year)
     console.log('Ort:', location)
+    console.log('--- GCLID Tracking ---')
+    console.log('Quelle:', source)
+    console.log('GCLID:', gclid || 'none')
+    console.log('Landing Page:', landingPage)
+    console.log('UTM:', utmSource, '/', utmMedium, '/', utmCampaign)
     console.log('================================')
 
     // Upload images to ImgBB
@@ -439,11 +492,18 @@ export async function POST(request: NextRequest) {
       console.log('⚠️ RESEND_API_KEY not configured, skipping email')
     }
 
-    // Send to Google Sheets
+    // Send to Google Sheets with GCLID tracking
     sheetsSent = await sendToGoogleSheets({
       brand, model, year, mileage, fuel, priceExpectation,
       name, email, phone, location, message,
       image_urls: imageUrls,
+      // GCLID tracking
+      source,
+      gclid,
+      landing_page: landingPage,
+      utm_source: utmSource,
+      utm_medium: utmMedium,
+      utm_campaign: utmCampaign,
     })
 
     // Return success if at least one method worked

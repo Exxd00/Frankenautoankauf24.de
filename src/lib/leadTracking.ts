@@ -1,5 +1,12 @@
 "use client"
 
+import {
+  getStoredGclidData,
+  buildLeadTrackingData,
+  type ContactType,
+  type LeadTrackingData
+} from './gclidTracking'
+
 export type LeadSource = {
   source_url: string
   source_path: string
@@ -17,6 +24,17 @@ export interface TrackEventData {
   device_type?: string
   timestamp?: string
   click_source?: string
+
+  // GCLID tracking data
+  contact_type?: string
+  date_time?: string
+  source?: string
+  gclid?: string
+  landing_page?: string
+  utm_source?: string
+  utm_medium?: string
+  utm_campaign?: string
+
   // Additional data for form_submit
   brand?: string
   model?: string
@@ -83,30 +101,66 @@ export function gtagEvent(eventName: string, params?: Record<string, unknown>) {
 }
 
 /**
+ * Get contact type emoji string for Google Sheets
+ */
+function getContactTypeString(eventType: TrackEventType): ContactType {
+  switch (eventType) {
+    case 'phone_click':
+      return '📞 Anruf'
+    case 'whatsapp_click':
+      return '💬 WhatsApp'
+    case 'form_submit':
+      return '📝 Formular'
+    default:
+      return '📝 Formular'
+  }
+}
+
+/**
  * Track an event and send it to Google Sheets via the API
  * Used for: whatsapp_click, phone_click, form_submit
+ * Now includes GCLID tracking data for Google Ads attribution
  */
 export async function trackToSheets(eventType: TrackEventType, additionalData?: Partial<TrackEventData>) {
   if (typeof window === "undefined") return
 
   const leadSource = getLeadSource()
-  const deviceType = window.innerWidth < 768 ? 'mobile' : 'desktop'
+  const gclidData = getStoredGclidData()
+  const contactType = getContactTypeString(eventType)
+  const trackingData = buildLeadTrackingData(contactType, {
+    name: additionalData?.name,
+    phone: additionalData?.phone,
+    email: additionalData?.email,
+  })
 
   const eventData: TrackEventData = {
     event_type: eventType,
     page_url: window.location.href,
     page_path: window.location.pathname,
     referrer: document.referrer || '',
-    device_type: deviceType,
+    device_type: trackingData.deviceType,
     timestamp: new Date().toISOString(),
     click_source: leadSource?.click_source || '',
+
+    // GCLID tracking data
+    contact_type: trackingData.contactType,
+    date_time: trackingData.dateTime,
+    source: trackingData.source,
+    gclid: gclidData?.gclid || '',
+    landing_page: trackingData.landingPage,
+    utm_source: gclidData?.utmSource || '',
+    utm_medium: gclidData?.utmMedium || '',
+    utm_campaign: gclidData?.utmCampaign || '',
+
     ...additionalData,
   }
 
-  // Also send GA4 event
+  // Also send GA4 event with enhanced tracking
   gtagEvent(eventType, {
     event_category: eventType === 'form_submit' ? 'Lead' : 'Engagement',
     event_label: window.location.pathname,
+    source: trackingData.source,
+    gclid: gclidData?.gclid || '',
   })
 
   try {
@@ -115,6 +169,7 @@ export async function trackToSheets(eventType: TrackEventType, additionalData?: 
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(eventData),
     })
+    console.log(`📊 ${eventType} tracked with GCLID:`, gclidData?.gclid || 'none')
   } catch (err) {
     console.error('Track event failed:', err)
   }
@@ -132,4 +187,20 @@ export function trackWhatsAppClick() {
  */
 export function trackPhoneClick() {
   trackToSheets('phone_click')
+}
+
+/**
+ * Get GCLID tracking data for forms
+ * Use this to include GCLID in form submissions
+ */
+export function getGclidTrackingForForm(): Partial<LeadTrackingData> {
+  const gclidData = getStoredGclidData()
+  return {
+    source: gclidData?.source || 'Direct',
+    gclid: gclidData?.gclid || '',
+    landingPage: gclidData?.landingPage || '',
+    utmSource: gclidData?.utmSource,
+    utmMedium: gclidData?.utmMedium,
+    utmCampaign: gclidData?.utmCampaign,
+  }
 }

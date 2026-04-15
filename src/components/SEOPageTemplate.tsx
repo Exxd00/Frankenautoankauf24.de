@@ -5,6 +5,7 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Check, Phone, Mail, ChevronDown, ChevronUp, MapPin, Clock, Shield, Car, Banknote, FileCheck } from "lucide-react"
 import Link from "next/link"
 import MainHeader from "@/components/MainHeader"
+import Footer from "@/components/Footer"
 import { useState } from "react"
 import { setLeadSource, gtagEvent, trackPhoneClick } from "@/lib/leadTracking"
 
@@ -255,50 +256,7 @@ export default function SEOPageTemplate({
         </section>
       )}
 
-      {/* Footer */}
-      <footer className="bg-gray-900 dark:bg-black text-white py-12">
-        <div className="container mx-auto px-4">
-          <div className="grid md:grid-cols-4 gap-8 mb-8">
-            <div>
-              <h3 className="font-bold mb-4">Kontakt</h3>
-              <p className="mb-2">Auto Ankauf Franken</p>
-              <p className="mb-2">0176 – 323 335 61</p>
-              <p>info@frankenautoankauf24.de</p>
-            </div>
-            <div>
-              <h3 className="font-bold mb-4">Zustand</h3>
-              <ul className="space-y-2">
-                <li><Link href="/auto-verkaufen-ohne-tuev" className="hover:text-orange-400">Ohne TÜV</Link></li>
-                <li><Link href="/auto-verkaufen-mit-motorschaden" className="hover:text-orange-400">Mit Motorschaden</Link></li>
-                <li><Link href="/auto-verkaufen-unfallschaden" className="hover:text-orange-400">Unfallschaden</Link></li>
-                <li><Link href="/auto-verkaufen-defektes-auto" className="hover:text-orange-400">Defektes Auto</Link></li>
-                <li><Link href="/faelle" className="hover:text-orange-400">Alle Fälle</Link></li>
-              </ul>
-            </div>
-            <div>
-              <h3 className="font-bold mb-4">Städte</h3>
-              <ul className="space-y-2">
-                <li><Link href="/autoankauf-nuernberg" className="hover:text-orange-400">Nürnberg</Link></li>
-                <li><Link href="/autoankauf-fuerth" className="hover:text-orange-400">Fürth</Link></li>
-                <li><Link href="/autoankauf-erlangen" className="hover:text-orange-400">Erlangen</Link></li>
-                <li><Link href="/autoankauf-wuerzburg" className="hover:text-orange-400">Würzburg</Link></li>
-                <li><Link href="/staedte" className="hover:text-orange-400">Alle Städte</Link></li>
-              </ul>
-            </div>
-            <div>
-              <h3 className="font-bold mb-4">Rechtliches</h3>
-              <ul className="space-y-2">
-                <li><Link href="/impressum" className="hover:text-orange-400">Impressum</Link></li>
-                <li><Link href="/datenschutz" className="hover:text-orange-400">Datenschutz</Link></li>
-              </ul>
-            </div>
-          </div>
-          <div className="border-t border-gray-700 pt-8 text-center text-sm text-gray-400">
-            <p>© 2024 Auto Ankauf Franken | Professioneller Autoankauf in Nürnberg & Franken</p>
-          </div>
-        </div>
-      </footer>
-
+      <Footer />
     </div>
   )
 }

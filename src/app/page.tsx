@@ -12,7 +12,9 @@ import Link from "next/link"
 import { useTheme } from "@/components/ThemeProvider"
 import { carBrands, generateYears, fuelTypes } from "@/data/carData"
 import { navItems } from "@/lib/navItems"
-import { setLeadSource, getLeadSource, clearLeadSource, gtagEvent, trackPhoneClick } from "@/lib/leadTracking"
+import Footer from "@/components/Footer"
+import { setLeadSource, getLeadSource, clearLeadSource, gtagEvent, trackPhoneClick, getGclidTrackingForForm } from "@/lib/leadTracking"
+import { getStoredGclidData } from "@/lib/gclidTracking"
 import { compressImage } from "@/lib/imageCompression"
 
 // GA4 Event tracking helper
@@ -187,6 +189,7 @@ export default function Home() {
 
       // Lead/source tracking fields (for GA4 + Google Sheet)
       const leadSource = getLeadSource()
+      const gclidData = getStoredGclidData()
       const referrer = typeof document !== 'undefined' ? document.referrer : ''
       const deviceType = typeof window !== 'undefined' ? (window.innerWidth < 768 ? 'mobile' : 'desktop') : 'unknown'
 
@@ -198,6 +201,14 @@ export default function Home() {
       payload.append('lead_source_url', leadSource?.source_url || '')
       payload.append('lead_source_path', leadSource?.source_path || '')
       payload.append('click_source', leadSource?.click_source || '')
+
+      // GCLID tracking fields for Google Ads attribution
+      payload.append('source', gclidData?.source || 'Direct')
+      payload.append('gclid', gclidData?.gclid || '')
+      payload.append('landing_page', gclidData?.landingPage || '')
+      payload.append('utm_source', gclidData?.utmSource || '')
+      payload.append('utm_medium', gclidData?.utmMedium || '')
+      payload.append('utm_campaign', gclidData?.utmCampaign || '')
 
       // keep source for next submit? clear after successful submission
 
@@ -738,52 +749,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Footer */}
-      <footer className="bg-gray-900 dark:bg-black text-white py-12">
-        <div className="container mx-auto px-4">
-          <div className="grid md:grid-cols-4 gap-8 mb-8">
-            <div>
-              <h3 className="font-bold mb-4">Kontakt</h3>
-              <p className="mb-2">Auto Ankauf Franken</p>
-              <p className="mb-2">0176 – 323 335 61</p>
-              <p className="mb-4">info@frankenautoankauf24.de</p>
-              <div className="flex gap-3">
-                <a href="https://wa.me/4917632333561" className="text-green-400 hover:text-green-300">WhatsApp</a>
-              </div>
-            </div>
-
-            <div>
-              <h3 className="font-bold mb-4">Städte</h3>
-              <ul className="space-y-2 text-sm">
-                <li><Link href="/autoankauf-nuernberg" className="hover:text-orange-400">Autoankauf Nürnberg</Link></li>
-                <li><Link href="/autoankauf-fuerth" className="hover:text-orange-400">Autoankauf Fürth</Link></li>
-                <li><Link href="/autoankauf-erlangen" className="hover:text-orange-400">Autoankauf Erlangen</Link></li>
-                <li><Link href="/autoankauf-bamberg" className="hover:text-orange-400">Autoankauf Bamberg</Link></li>
-                <li><Link href="/autoankauf-wuerzburg" className="hover:text-orange-400">Autoankauf Würzburg</Link></li>
-                <li><Link href="/autoankauf-regensburg" className="hover:text-orange-400">Autoankauf Regensburg</Link></li>
-                <li><Link href="/autoankauf-ingolstadt" className="hover:text-orange-400">Autoankauf Ingolstadt</Link></li>
-              </ul>
-            </div>
-            <div>
-              <h3 className="font-bold mb-4">Rechtliches</h3>
-              <ul className="space-y-2 text-sm">
-                <li><Link href="/" className="hover:text-orange-400">Startseite</Link></li>
-                <li><a href="#form" className="hover:text-orange-400">Kostenlose Bewertung</a></li>
-                <li><Link href="/impressum" className="hover:text-orange-400">Impressum</Link></li>
-                <li><Link href="/datenschutz" className="hover:text-orange-400">Datenschutz</Link></li>
-              </ul>
-            </div>
-          </div>
-          <div className="border-t border-gray-700 pt-8 text-center text-sm text-gray-400">
-            <p className="mb-4">© 2024 Auto Ankauf Franken | Professioneller Autoankauf in Nürnberg & Franken</p>
-            <div className="flex justify-center gap-6">
-              <Link href="/impressum" className="hover:text-orange-400">Impressum</Link>
-              <Link href="/datenschutz" className="hover:text-orange-400">Datenschutz</Link>
-            </div>
-          </div>
-        </div>
-      </footer>
-
+      <Footer />
     </div>
   )
 }
