@@ -306,13 +306,6 @@ export const CASES: Case[] = [
 
   // Recht / Papiere
   {
-    title: "Auto verkaufen ohne Fahrzeugbrief",
-    slug: "auto-verkaufen-ohne-fahrzeugbrief",
-    pain: "Ohne Zulassungsbescheinigung II entsteht Misstrauen – privat fast unmöglich.",
-    docsHint: "Zulassungsbescheinigung I, Ausweisdokument, ggf. Verlustanzeige/Antrag.",
-    siblingSlug: "auto-verkaufen-ohne-tuev",
-  },
-  {
     title: "Auto verkaufen bei Erbschaft",
     slug: "auto-verkaufen-erbschaft",
     pain: "Erbschaftsfälle brauchen klare Dokumente – privat sind viele unsicher.",
@@ -522,13 +515,6 @@ export const CASES: Case[] = [
   },
 
   // Recht & Papiere
-  {
-    title: "Auto verkaufen ohne Fahrzeugbrief",
-    slug: "auto-verkaufen-ohne-fahrzeugbrief",
-    pain: "Ohne Zulassungsbescheinigung Teil II ist Privatverkauf praktisch blockiert.",
-    docsHint: "Zulassungsbescheinigung Teil I, Eigentumsnachweis, ggf. Verlustanzeige.",
-    siblingSlug: "auto-verkaufen-finanzierung",
-  },
   {
     title: "Auto verkaufen mit Finanzierung",
     slug: "auto-verkaufen-finanzierung",

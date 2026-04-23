@@ -19,7 +19,7 @@ export default function AutoVerkaufenSofortPage() {
     },
     {
       question: "Was muss ich für den Sofortverkauf vorbereiten?",
-      answer: "Halten Sie Fahrzeugschein, Fahrzeugbrief, Ihren Personalausweis und alle Fahrzeugschlüssel bereit. Mehr brauchen Sie nicht – wir kümmern uns um alles Weitere."
+      answer: "Halten Sie zwingend Fahrzeugschein, Fahrzeugbrief, Ihren Personalausweis und alle Fahrzeugschlüssel bereit. Wichtig: Ohne vollständige Fahrzeugpapiere ist leider kein Ankauf möglich. Wir kümmern uns um alles Weitere."
     },
     {
       question: "Muss mein Auto fahrtüchtig sein für den Sofortankauf?",

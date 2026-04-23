@@ -15,6 +15,10 @@ export default function AutoVerkaufenHeutePage() {
       answer: 'Oft ja – je nach Fahrzeug, Zustand und Erreichbarkeit. Senden Sie die Daten über das Formular und wir sagen Ihnen schnell, was heute möglich ist.'
     },
     {
+      question: 'Welche Unterlagen benötige ich?',
+      answer: 'Zwingend erforderlich: Fahrzeugschein (Zulassungsbescheinigung Teil I), Fahrzeugbrief (Teil II), Personalausweis und alle Fahrzeugschlüssel. Ohne vollständige Fahrzeugpapiere ist kein Ankauf möglich.'
+    },
+    {
       question: 'Wie schnell bekomme ich ein Angebot?',
       answer: 'In der Regel sehr zügig. Je vollständiger Ihre Angaben sind, desto schneller ist die Einschätzung.'
     },

@@ -33,7 +33,7 @@ function featureIcon(kind: 'shield' | 'clock' | 'banknote') {
 }
 
 export default async function AutoSofortCityPage({ params }: { params: Promise<Params> }) {
-  
+
   const p = await params
   const citySlug = normalizeSlug(p.city)
   if (!isPSEOCityKey(citySlug)) {
@@ -59,7 +59,7 @@ export default async function AutoSofortCityPage({ params }: { params: Promise<P
     },
     {
       question: `Welche Unterlagen brauche ich in ${city.name}?`,
-      answer: `Meist genügen Zulassungsbescheinigung Teil I/II, Ausweis und Schlüssel. Wenn etwas fehlt, sagen Sie es im Formular – wir finden eine Lösung.`
+      answer: `Sie benötigen zwingend: Zulassungsbescheinigung Teil I (Fahrzeugschein), Teil II (Fahrzeugbrief), Personalausweis und alle Schlüssel. Ohne vollständige Fahrzeugpapiere ist kein Ankauf möglich.`
     },
     {
       question: `Wie bekomme ich mein Geld?`,

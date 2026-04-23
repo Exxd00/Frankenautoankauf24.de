@@ -117,7 +117,7 @@ const citySlug = normalizeSlug(p.city)
     },
     {
       question: `Welche Unterlagen brauche ich in ${city.name}?`,
-      answer: "In der Regel: Zulassungsbescheinigung Teil I/II (Schein/Brief) und ein Ausweis. Wenn vorhanden: Serviceheft, HU/AU, Rechnungen.",
+      answer: "Zwingend erforderlich: Zulassungsbescheinigung Teil I (Fahrzeugschein), Teil II (Fahrzeugbrief), Personalausweis und alle Fahrzeugschlüssel. Ohne vollständige Papiere ist kein Ankauf möglich. Optional: Serviceheft, HU/AU, Rechnungen.",
     },
     {
       question: `Kann mein Auto in ${city.name} auch abgeholt werden?`,

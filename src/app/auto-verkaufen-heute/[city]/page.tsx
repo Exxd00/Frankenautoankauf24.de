@@ -15,7 +15,7 @@ export async function generateStaticParams(): Promise<Params[]> {
 }
 
 export async function generateMetadata({ params }: { params: Promise<Params> }): Promise<Metadata> {
-  
+
   const p = await params
 const citySlug = normalizeSlug(p.city)
   if (!isPSEOCityKey(citySlug)) {
@@ -35,7 +35,7 @@ function icon(kind: 'clock' | 'banknote' | 'shield') {
 }
 
 export default async function AutoHeuteCityPage({ params }: { params: Promise<Params> }) {
-  
+
   const p = await params
 const citySlug = normalizeSlug(p.city)
   if (!isPSEOCityKey(citySlug)) {
@@ -56,7 +56,7 @@ const citySlug = normalizeSlug(p.city)
   const faqs = [
     {
       question: `Was brauche ich für einen Verkauf heute in ${city.name}?`,
-      answer: `Am besten: Zulassungsbescheinigung Teil I/II, Ausweis und Schlüssel. Je genauer die Fahrzeugdaten, desto schneller können wir die Abwicklung in ${city.name} planen.`
+      answer: `Zwingend erforderlich: Zulassungsbescheinigung Teil I (Fahrzeugschein), Teil II (Fahrzeugbrief), Personalausweis und alle Fahrzeugschlüssel. Ohne vollständige Papiere ist kein Ankauf möglich. Je genauer die Fahrzeugdaten, desto schneller die Abwicklung in ${city.name}.`
     },
     {
       question: `Wie schnell erhalte ich in ${city.name} eine Rückmeldung?`,

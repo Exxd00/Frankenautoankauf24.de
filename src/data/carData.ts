@@ -111,7 +111,7 @@ export const conditionPages = [
   { slug: "auto-verkaufen-leasing", title: "Leasing Auto verkaufen", keyword: "Leasing Auto verkaufen" },
   { slug: "auto-verkaufen-export", title: "Auto Export verkaufen", keyword: "Auto Export verkaufen" },
   { slug: "auto-verkaufen-bastlerfahrzeug", title: "Bastlerfahrzeug verkaufen", keyword: "Bastlerfahrzeug verkaufen" },
-  { slug: "auto-verkaufen-ohne-fahrzeugbrief", title: "Auto ohne Fahrzeugbrief verkaufen", keyword: "Auto ohne Brief verkaufen" },
+
   { slug: "auto-verkaufen-diesel", title: "Diesel Auto verkaufen", keyword: "Diesel Auto verkaufen" },
   { slug: "auto-verkaufen-elektroauto", title: "Elektroauto verkaufen", keyword: "Elektroauto verkaufen" },
   { slug: "auto-verkaufen-sofort", title: "Auto sofort verkaufen", keyword: "Auto sofort verkaufen" }

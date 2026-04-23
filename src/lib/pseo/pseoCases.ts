@@ -49,8 +49,7 @@ export const pseoCasesList: PSEOCase[] = [
   // Legal / paperwork
   { key: 'ohne-tuev', title: 'Auto verkaufen ohne TÜV', shortLabel: 'ohne TÜV', keyword: 'TÜV' },
   { key: 'abgemeldet', title: 'Abgemeldetes Auto verkaufen', shortLabel: 'abgemeldet', keyword: 'Abmeldung' },
-  { key: 'kein-fahrzeugschein', title: 'Auto verkaufen ohne Fahrzeugschein', shortLabel: 'ohne Fahrzeugschein', keyword: 'Fahrzeugschein' },
-  { key: 'kein-fahrzeugbrief', title: 'Auto verkaufen ohne Fahrzeugbrief', shortLabel: 'ohne Fahrzeugbrief', keyword: 'Fahrzeugbrief' },
+
   { key: 'erbschaft', title: 'Auto aus Erbschaft verkaufen', shortLabel: 'aus Erbschaft', keyword: 'Erbschaft' },
   { key: 'leasingruecklaeufer', title: 'Leasingrückläufer verkaufen', shortLabel: 'als Leasingrückläufer', keyword: 'Leasing' },
   { key: 'firmenwagen', title: 'Firmenwagen verkaufen', shortLabel: 'als Firmenwagen', keyword: 'Firma' },

@@ -148,7 +148,7 @@ export default async function CaseGeneralPage({ params }: { params: Promise<Para
     },
     {
       question: 'Welche Unterlagen benötige ich für den Verkauf?',
-      answer: 'Sie benötigen: Fahrzeugschein (Zulassungsbescheinigung Teil I), Fahrzeugbrief (Zulassungsbescheinigung Teil II), Ihren Personalausweis und alle vorhandenen Fahrzeugschlüssel. Falls Unterlagen fehlen, sprechen Sie uns an - oft finden wir eine Lösung.'
+      answer: 'Sie benötigen zwingend: Fahrzeugschein (Zulassungsbescheinigung Teil I), Fahrzeugbrief (Zulassungsbescheinigung Teil II), Ihren Personalausweis und alle vorhandenen Fahrzeugschlüssel. Wichtig: Ohne vollständige Fahrzeugpapiere können wir leider keinen Ankauf durchführen.'
     },
     {
       question: 'Ist der Service wirklich kostenlos?',

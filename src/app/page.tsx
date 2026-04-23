@@ -699,9 +699,9 @@ export default function Home() {
             {[
               { q: "Wie schnell kann ich mein Auto verkaufen?", a: "Oft noch am selben Tag - kontaktieren Sie uns für einen schnellen Termin." },
               { q: "Kaufen Sie auch Unfallwagen?", a: "Ja, wir kaufen Unfallwagen, defekte Autos und Fahrzeuge ohne TÜV." },
+              { q: "Welche Unterlagen benötige ich?", a: "Sie benötigen zwingend: Fahrzeugschein, Fahrzeugbrief, Personalausweis und alle Fahrzeugschlüssel. Ohne vollständige Papiere ist kein Ankauf möglich." },
               { q: "Wie erfolgt die Zahlung?", a: "Sofortige Barzahlung oder Überweisung - Sie entscheiden." },
               { q: "Muss ich mein Auto selbst abmelden?", a: "Nein, wir übernehmen die kostenlose Abmeldung für Sie." },
-              { q: "Welche Marken kaufen Sie an?", a: "Alle Marken und Modelle - von VW bis Mercedes, BMW bis Opel." },
               { q: "Ist die Bewertung kostenlos?", a: "Ja, die Bewertung ist immer kostenlos und unverbindlich." }
             ].map((faq, i) => (
               <details key={i} className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 group overflow-hidden">
