@@ -1,3 +1,4 @@
+import ContactLink from "@/components/ContactLink"
 import Link from "next/link"
 
 export default function Footer() {
@@ -12,14 +13,14 @@ export default function Footer() {
             <p className="mb-2">0176 – 323 335 61</p>
             <p className="mb-4">info@frankenautoankauf24.de</p>
             <div className="flex gap-3">
-              <a
+              <ContactLink
                 href="https://wa.me/4917632333561"
                 className="text-green-400 hover:text-green-300 transition-colors"
                 target="_blank"
                 rel="noopener noreferrer"
               >
                 WhatsApp
-              </a>
+              </ContactLink>
             </div>
           </div>
 

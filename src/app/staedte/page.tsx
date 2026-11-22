@@ -1,3 +1,4 @@
+import ContactLink from "@/components/ContactLink"
 import Link from "next/link"
 import { pseoCities } from "@/lib/pseo/pseoCities"
 import { MapPin, Star, ArrowRight, Phone } from "lucide-react"
@@ -155,13 +156,13 @@ export default function StaedtePage() {
               >
                 Jetzt Angebot anfordern
               </Link>
-              <a
+              <ContactLink
                 href="tel:+4917632333561"
                 className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-white/10 hover:bg-white/20 text-white rounded-xl font-semibold transition-all"
               >
                 <Phone className="w-5 h-5" />
                 0176 32333561
-              </a>
+              </ContactLink>
             </div>
           </div>
         </section>

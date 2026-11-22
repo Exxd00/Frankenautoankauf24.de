@@ -1,5 +1,6 @@
 "use client"
 
+import ContactLink from "@/components/ContactLink"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
@@ -13,7 +14,7 @@ import { useTheme } from "@/components/ThemeProvider"
 import { carBrands, generateYears, fuelTypes } from "@/data/carData"
 import { navItems } from "@/lib/navItems"
 import Footer from "@/components/Footer"
-import { setLeadSource, getLeadSource, clearLeadSource, gtagEvent, trackPhoneClick, getGclidTrackingForForm } from "@/lib/leadTracking"
+import { setLeadSource, getLeadSource, clearLeadSource, gtagEvent, getGclidTrackingForForm } from "@/lib/leadTracking"
 import { getStoredGclidData } from "@/lib/gclidTracking"
 import { compressImage } from "@/lib/imageCompression"
 
@@ -735,9 +736,9 @@ export default function Home() {
       <section className="py-8 bg-gray-900 text-white">
         <div className="container mx-auto px-4">
           <div className="flex flex-col md:flex-row items-center justify-center gap-6">
-            <a href="tel:+4917632333561" className="flex items-center gap-2 hover:text-orange-400" onClick={() => trackPhoneClick()}>
+            <ContactLink href="tel:+4917632333561" className="flex items-center gap-2 hover:text-orange-400">
               <Phone className="w-5 h-5" /><span>0176 32333561</span>
-            </a>
+            </ContactLink>
             <a href="mailto:info@frankenautoankauf24.de" className="flex items-center gap-2 hover:text-orange-400">
               <Mail className="w-5 h-5" /><span>info@frankenautoankauf24.de</span>
             </a>

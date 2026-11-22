@@ -1,9 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { writeSheetsEvent } from '@/lib/sheetsWebhook'
 
 // API Keys from environment
 const RESEND_API_KEY = process.env.RESEND_API_KEY || ''
 const IMGBB_API_KEY = process.env.IMGBB_API_KEY || process.env.IMGG_API_KEY || ''
-const SHEETS_WEBHOOK_URL = process.env.SHEETS_WEBHOOK_URL || ''
 const RECIPIENT_EMAIL = process.env.RECIPIENT_EMAIL || 'info@frankenautoankauf24.de'
 const FROM_EMAIL = process.env.FROM_EMAIL || 'info@frankenautoankauf24.de'
 
@@ -310,70 +310,40 @@ async function sendToGoogleSheets(data: {
   utm_medium?: string
   utm_campaign?: string
 }): Promise<boolean> {
-  if (!SHEETS_WEBHOOK_URL) {
-    console.log('⚠️ SHEETS_WEBHOOK_URL not configured')
-    return false
+  const payload = {
+    // Primary tracking fields
+    event_type: 'form_submit',
+    timestamp: new Date().toISOString(),
+    date_time: formatGermanDateTime(),
+    contact_type: '📝 Formular',
+    name: data.name || '-',
+    phone: data.phone || '-',
+    source: data.source || 'Direct',
+    gclid: data.gclid || '-',
+    rating: '', // Empty for new leads
+
+    // Contact details
+    email: data.email || '-',
+    location: data.location || '-',
+
+    // Vehicle data
+    brand: data.brand || '-',
+    model: data.model || '-',
+    year: data.year || '-',
+    mileage: data.mileage || '-',
+    fuel: data.fuel || '-',
+    priceExpectation: data.priceExpectation || '-',
+    message: data.message || '-',
+    image_urls: data.image_urls || [],
+
+    // UTM tracking
+    landing_page: data.landing_page || '',
+    utm_source: data.utm_source || '',
+    utm_medium: data.utm_medium || '',
+    utm_campaign: data.utm_campaign || '',
   }
 
-  try {
-    // Build payload with GCLID tracking
-    // Format: Datum/Uhrzeit | Kontaktart | Name | Telefon | Quelle | GCLID | Bewertung | ...vehicle data
-    const payload = {
-      // Primary tracking fields
-      date_time: formatGermanDateTime(),
-      contact_type: '📝 Formular',
-      name: data.name || '-',
-      phone: data.phone || '-',
-      source: data.source || 'Direct',
-      gclid: data.gclid || '-',
-      rating: '', // Empty for new leads
-
-      // Contact details
-      email: data.email || '-',
-      location: data.location || '-',
-
-      // Vehicle data
-      brand: data.brand || '-',
-      model: data.model || '-',
-      year: data.year || '-',
-      mileage: data.mileage || '-',
-      fuel: data.fuel || '-',
-      priceExpectation: data.priceExpectation || '-',
-      message: data.message || '-',
-      image_urls: data.image_urls || [],
-
-      // UTM tracking
-      landing_page: data.landing_page || '',
-      utm_source: data.utm_source || '',
-      utm_medium: data.utm_medium || '',
-      utm_campaign: data.utm_campaign || '',
-    }
-
-    console.log('📤 Sending to Google Sheets with GCLID tracking:')
-    console.log('   Name:', payload.name)
-    console.log('   Phone:', payload.phone)
-    console.log('   Source:', payload.source)
-    console.log('   GCLID:', payload.gclid)
-
-    // IMPORTANT: Use text/plain for Google Apps Script compatibility
-    // Google Apps Script has issues with application/json content-type
-    const response = await fetch(SHEETS_WEBHOOK_URL, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'text/plain;charset=utf-8',
-      },
-      body: JSON.stringify(payload),
-      redirect: 'follow',
-    })
-
-    const responseText = await response.text()
-    console.log('✅ Google Sheets response:', response.status, responseText)
-
-    return response.status === 200 || response.status === 302
-  } catch (error) {
-    console.error('❌ Google Sheets webhook failed:', error)
-    return false
-  }
+  return writeSheetsEvent(payload)
 }
 
 export async function POST(request: NextRequest) {
@@ -382,7 +352,6 @@ export async function POST(request: NextRequest) {
   console.log('  RESEND_API_KEY:', RESEND_API_KEY ? '✅ Set (' + RESEND_API_KEY.substring(0, 10) + '...)' : '❌ Not set')
   console.log('  FROM_EMAIL:', FROM_EMAIL)
   console.log('  RECIPIENT_EMAIL:', RECIPIENT_EMAIL)
-  console.log('  SHEETS_WEBHOOK_URL:', SHEETS_WEBHOOK_URL ? '✅ Set' : '❌ Not set')
   console.log('  IMGBB_API_KEY:', IMGBB_API_KEY ? '✅ Set' : '❌ Not set')
 
   try {

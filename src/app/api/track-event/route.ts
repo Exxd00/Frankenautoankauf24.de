@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 
-// Google Sheets webhook URL for tracking events
-const SHEETS_WEBHOOK_URL = process.env.SHEETS_WEBHOOK_URL || ''
+import { writeSheetsEvent } from '@/lib/sheetsWebhook'
 
 export async function POST(request: NextRequest) {
   try {
@@ -26,64 +25,44 @@ export async function POST(request: NextRequest) {
     console.log('Device:', data.device_type)
     console.log('==========================================')
 
-    // Forward to Google Sheets if webhook is configured
-    if (SHEETS_WEBHOOK_URL) {
-      try {
-        // Build payload optimized for Google Sheets columns:
-        // Datum/Uhrzeit | Kontaktart | Name | Telefon | Quelle | GCLID | Bewertung
-        const sheetsPayload = {
-          // Primary tracking fields for the new format
-          date_time: data.date_time || new Date().toLocaleString('de-DE'),
-          contact_type: data.contact_type || getContactTypeEmoji(data.event_type),
-          name: data.name || '-',
-          phone: data.phone || '-',
-          source: data.source || 'Direct',
-          gclid: data.gclid || '-',
-          rating: '', // Empty for new leads, to be filled manually
+    const sheetsPayload = {
+      // Primary tracking fields for the new format
+      date_time: data.date_time || new Date().toLocaleString('de-DE'),
+      contact_type: data.contact_type || getContactTypeEmoji(data.event_type),
+      name: data.name || '-',
+      phone: data.phone || '-',
+      source: data.source || 'Direct',
+      gclid: data.gclid || '-',
+      rating: '', // Empty for new leads, to be filled manually
 
-          // Additional context fields
-          event_type: data.event_type,
-          timestamp: data.timestamp || new Date().toISOString(),
-          page_url: data.page_url || '',
-          page_path: data.page_path || '',
-          landing_page: data.landing_page || '',
-          referrer: data.referrer || '',
-          device_type: data.device_type || '',
-          click_source: data.click_source || '',
+      // Additional context fields
+      event_type: data.event_type,
+      timestamp: data.timestamp || new Date().toISOString(),
+      page_url: data.page_url || '',
+      page_path: data.page_path || '',
+      landing_page: data.landing_page || '',
+      referrer: data.referrer || '',
+      device_type: data.device_type || '',
+      click_source: data.click_source || '',
 
-          // UTM tracking
-          utm_source: data.utm_source || '',
-          utm_medium: data.utm_medium || '',
-          utm_campaign: data.utm_campaign || '',
+      // UTM tracking
+      utm_source: data.utm_source || '',
+      utm_medium: data.utm_medium || '',
+      utm_campaign: data.utm_campaign || '',
 
-          // Form data (only for form_submit events)
-          email: data.email || '',
-          location: data.location || '',
-          brand: data.brand || '',
-          model: data.model || '',
-          year: data.year || '',
-          mileage: data.mileage || '',
-          fuel: data.fuel || '',
-          message: data.message || '',
-        }
+      // Form data (only for form_submit events)
+      email: data.email || '',
+      location: data.location || '',
+      brand: data.brand || '',
+      model: data.model || '',
+      year: data.year || '',
+      mileage: data.mileage || '',
+      fuel: data.fuel || '',
+      message: data.message || '',
+    }
 
-        // Use text/plain for Google Apps Script compatibility
-        const sheetsRes = await fetch(SHEETS_WEBHOOK_URL, {
-          method: 'POST',
-          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-          body: JSON.stringify(sheetsPayload),
-          redirect: 'follow',
-        })
-
-        console.log('✅ Sheets webhook sent for tracking event')
-        console.log('   Status:', sheetsRes.status)
-        console.log('   Source:', sheetsPayload.source)
-        console.log('   GCLID:', sheetsPayload.gclid)
-      } catch (err) {
-        console.error('❌ Sheets webhook failed for tracking event:', err)
-      }
-    } else {
-      console.log('⚠️ SHEETS_WEBHOOK_URL not configured, event not sent to Google Sheets')
+    if (!(await writeSheetsEvent(sheetsPayload))) {
+      return NextResponse.json({ success: false, message: 'Sheet write unconfirmed' }, { status: 502 })
     }
 
     return NextResponse.json({ success: true })
