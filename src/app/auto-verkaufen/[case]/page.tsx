@@ -1,3 +1,4 @@
+import ContactLink from "@/components/ContactLink"
 import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
@@ -207,7 +208,7 @@ export default async function CaseGeneralPage({ params }: { params: Promise<Para
           <p className="text-lg text-gray-700 dark:text-gray-300">
             Egal ob Ihr Fahrzeug {c.shortLabel} noch fahrbereit ist oder nicht - wir machen Ihnen ein Angebot.
             Nutzen Sie unser <Link href="/#form" className="text-orange-600 hover:underline font-medium">kostenloses Anfrageformular</Link> oder
-            rufen Sie uns direkt an unter <a href="tel:+4917632333561" className="text-orange-600 hover:underline font-medium">0176 - 323 335 61</a>.
+            rufen Sie uns direkt an unter <ContactLink href="tel:+4917632333561" className="text-orange-600 hover:underline font-medium">0176 - 323 335 61</ContactLink>.
           </p>
         </>
       }

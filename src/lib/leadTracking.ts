@@ -164,12 +164,13 @@ export async function trackToSheets(eventType: TrackEventType, additionalData?: 
   })
 
   try {
-    await fetch('/api/track-event', {
+    const response = await fetch('/api/track-event', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(eventData),
+      keepalive: true,
     })
-    console.log(`📊 ${eventType} tracked with GCLID:`, gclidData?.gclid || 'none')
+    if (!response.ok) throw new Error(`Tracking request returned HTTP ${response.status}`)
   } catch (err) {
     console.error('Track event failed:', err)
   }
